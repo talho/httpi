@@ -84,7 +84,13 @@ module HTTPI
         unless ssl.verify_mode == :none
           client.ssl_config.client_cert = ssl.cert
           client.ssl_config.client_key = ssl.cert_key
-          client.ssl_config.client_ca = ssl.ca_cert if ssl.ca_cert_file
+          client.ssl_config.client_ca = ssl.ca_cert if ssl.ca_cert_file # this is the client CA, not peer CA
+	  begin
+            client.ssl_config.ca_file = ssl.ca_file if ssl.ca_file
+            client.ssl_config.ca_path = ssl.ca_path if ssl.ca_path
+          rescue
+            # don't explode if you are not using the talho version of httpclient with the expanded ssl_config class.
+          end
         end
         client.ssl_config.verify_mode = ssl.openssl_verify_mode
       end
